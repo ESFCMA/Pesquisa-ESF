@@ -80,50 +80,53 @@
 <body>
 
 <div class="container">
-    <!-- Logo adicionada -->
     <img src="Capturar-removebg-preview.png" alt="Logo Engenheiros Sem Fronteiras" class="logo">
 
     <h2>Pesquisa de Satisfação</h2>
 
-    <div class="input-group">
-        <label for="nome">Indique seu nome e setor:</label>
-        <input type="text" id="nome" placeholder="Seu nome e setor">
-    </div>
+    <form id="surveyForm" action="https://formspree.io/f/xpwavkob" method="POST">
+        <div class="input-group">
+            <label for="nome">Indique seu nome e setor:</label>
+            <input type="text" id="nome" name="nome" placeholder="Seu nome e setor" required>
+        </div>
 
-    <div class="input-group">
-        <label>Como está sua expectativa para o que foi alinhado hoje?</label>
-        <div class="stars" id="expectativa-stars">
-            <span class="star" data-value="1" onclick="selectStar(this, 'expectativa')">&#9733;</span>
-            <span class="star" data-value="2" onclick="selectStar(this, 'expectativa')">&#9733;</span>
-            <span class="star" data-value="3" onclick="selectStar(this, 'expectativa')">&#9733;</span>
-            <span class="star" data-value="4" onclick="selectStar(this, 'expectativa')">&#9733;</span>
-            <span class="star" data-value="5" onclick="selectStar(this, 'expectativa')">&#9733;</span>
+        <div class="input-group">
+            <label>Como está sua expectativa para o que foi alinhado hoje?</label>
+            <div class="stars" id="expectativa-stars">
+                <span class="star" data-value="1" onclick="selectStar(this, 'expectativa')">&#9733;</span>
+                <span class="star" data-value="2" onclick="selectStar(this, 'expectativa')">&#9733;</span>
+                <span class="star" data-value="3" onclick="selectStar(this, 'expectativa')">&#9733;</span>
+                <span class="star" data-value="4" onclick="selectStar(this, 'expectativa')">&#9733;</span>
+                <span class="star" data-value="5" onclick="selectStar(this, 'expectativa')">&#9733;</span>
+            </div>
+            <div class="legend">
+                <span>Muito ruim</span>
+                <span>Normal</span>
+                <span>Muito bom</span>
+            </div>
+            <input type="hidden" name="expectativa" id="expectativa" required>
         </div>
-        <div class="legend">
-            <span>Muito ruim</span>
-            <span>Normal</span>
-            <span>Muito bom</span>
-        </div>
-    </div>
 
-    <div class="input-group">
-        <label>Como foi a sua semana?</label>
-        <div class="stars" id="semana-stars">
-            <span class="star" data-value="1" onclick="selectStar(this, 'semana')">&#9733;</span>
-            <span class="star" data-value="2" onclick="selectStar(this, 'semana')">&#9733;</span>
-            <span class="star" data-value="3" onclick="selectStar(this, 'semana')">&#9733;</span>
-            <span class="star" data-value="4" onclick="selectStar(this, 'semana')">&#9733;</span>
-            <span class="star" data-value="5" onclick="selectStar(this, 'semana')">&#9733;</span>
+        <div class="input-group">
+            <label>Como foi a sua semana?</label>
+            <div class="stars" id="semana-stars">
+                <span class="star" data-value="1" onclick="selectStar(this, 'semana')">&#9733;</span>
+                <span class="star" data-value="2" onclick="selectStar(this, 'semana')">&#9733;</span>
+                <span class="star" data-value="3" onclick="selectStar(this, 'semana')">&#9733;</span>
+                <span class="star" data-value="4" onclick="selectStar(this, 'semana')">&#9733;</span>
+                <span class="star" data-value="5" onclick="selectStar(this, 'semana')">&#9733;</span>
+            </div>
+            <div class="legend">
+                <span>Muito ruim</span>
+                <span>Normal</span>
+                <span>Muito bom</span>
+            </div>
+            <input type="hidden" name="semana" id="semana" required>
         </div>
-        <div class="legend">
-            <span>Muito ruim</span>
-            <span>Normal</span>
-            <span>Muito bom</span>
-        </div>
-    </div>
 
-    <button onclick="submitSurvey()">Enviar</button>
-    <div id="message" class="message"></div>
+        <button type="submit">Enviar</button>
+        <div id="message" class="message"></div>
+    </form>
 </div>
 
 <script>
@@ -147,35 +150,22 @@
         // Define a avaliação com base na categoria (expectativa ou semana)
         if (category === 'expectativa') {
             expectativaRating = value;
+            document.getElementById('expectativa').value = value; // Atualiza o valor oculto
         } else if (category === 'semana') {
             semanaRating = value;
+            document.getElementById('semana').value = value; // Atualiza o valor oculto
         }
     }
 
-    function submitSurvey() {
-        const nome = document.getElementById('nome').value;
-
-        if (nome === '' || expectativaRating === 0 || semanaRating === 0) {
+    document.getElementById('surveyForm').onsubmit = function() {
+        if (document.getElementById('nome').value === '' || expectativaRating === 0 || semanaRating === 0) {
             alert('Por favor, preencha todas as informações.');
-            return;
+            return false; // Não envia o formulário
         }
-
-        // Salvando as respostas no localStorage (ou enviar para um servidor)
-        const respostas = JSON.parse(localStorage.getItem('respostas')) || [];
-        respostas.push({ nome, expectativa: expectativaRating, semana: semanaRating });
-        localStorage.setItem('respostas', JSON.stringify(respostas));
 
         document.getElementById('message').innerText = "Obrigado por responder à pesquisa!";
-        document.getElementById('nome').value = '';
-
-        // Reseta as estrelas
-        document.querySelectorAll('.star').forEach(star => star.classList.remove('selected'));
-        expectativaRating = 0;
-        semanaRating = 0;
+        return true; // Envia o formulário
     }
-
-    // Para ver as respostas no console (somente para quem criou o link)
-    console.log(JSON.parse(localStorage.getItem('respostas')));
 </script>
 
 </body>
